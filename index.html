@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<meta name="color-scheme" content="light dark">
+<title>옵시디언으로 열기</title>
+<!--
+  텔레그램 알림의 링크 → 이 페이지 → 옵시디언 앱(obsidian://)으로 넘겨 줍니다.
+  노트 정보는 주소의 '#' 뒤에만 있어 이 페이지를 올린 서버(GitHub)로는 전송되지 않습니다.
+  예: https://아이디.github.io/obsidian-link/#vault=MacroVault&file=20%20연준%2FFOMC%20성명%2F2026-10-29%20FOMC%20성명
+  바깥 파일·추적 코드 없음.
+-->
+<style>
+  :root { --bg:#f5f4f0; --fg:#1d1d1f; --muted:#6e6e73; --card:#ffffff; --line:#e3e0d8; --accent:#5b45c9; --accent-fg:#ffffff; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#141416; --fg:#ececee; --muted:#a1a1a6; --card:#1e1e21; --line:#2e2e33; --accent:#8b74ff; --accent-fg:#ffffff; }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--fg); }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", sans-serif;
+         line-height: 1.6; padding: 56px 16px; }
+  main { max-width: 440px; margin: 0 auto; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 24px 20px; }
+  .folder { color: var(--muted); font-size: 13px; word-break: keep-all; overflow-wrap: anywhere; }
+  h1 { font-size: 20px; line-height: 1.4; margin: 4px 0 20px; word-break: keep-all; overflow-wrap: anywhere; }
+  a.btn { display: block; text-align: center; background: var(--accent); color: var(--accent-fg); text-decoration: none;
+          font-weight: 600; font-size: 17px; padding: 14px 16px; border-radius: 12px; }
+  a.btn:active { opacity: .85; }
+  p.hint { color: var(--muted); font-size: 13px; margin: 16px 0 0; }
+</style>
+</head>
+<body>
+<main>
+  <div class="card">
+    <div class="folder" id="folder">MacroVault</div>
+    <h1 id="name">옵시디언 노트</h1>
+    <a class="btn" id="open" href="#">옵시디언에서 열기</a>
+    <p class="hint" id="hint">자동으로 열리지 않으면 버튼을 누르세요.<br>
+      노트가 없다고 나오면 동기화가 끝난 뒤(몇 초) 다시 누르세요.</p>
+  </div>
+</main>
+<script>
+(function () {
+  var raw = location.hash.replace(/^#/, "");
+  var vault = "MacroVault", file = "";
+  try {
+    if (raw.indexOf("=") >= 0) {
+      var q = new URLSearchParams(raw);
+      vault = q.get("vault") || vault;
+      file = q.get("file") || "";
+    } else if (raw) {
+      file = decodeURIComponent(raw);
+    }
+  } catch (e) { file = ""; }
+  var nameEl = document.getElementById("name"), folderEl = document.getElementById("folder");
+  var btn = document.getElementById("open"), hint = document.getElementById("hint");
+  if (!file || file.length > 500 || vault.length > 100) {
+    nameEl.textContent = "링크에 노트 정보가 없습니다";
+    btn.style.display = "none";
+    hint.textContent = "텔레그램 알림의 링크로 다시 들어와 주세요.";
+    return;
+  }
+  file = file.replace(/\.md$/i, "");
+  var parts = file.split("/");
+  nameEl.textContent = parts.pop();
+  folderEl.textContent = vault + (parts.length ? " › " + parts.join(" › ") : "");
+  document.title = nameEl.textContent + " — 옵시디언으로 열기";
+  var uri = "obsidian://open?vault=" + encodeURIComponent(vault) + "&file=" + encodeURIComponent(file);
+  btn.href = uri;
+  setTimeout(function () { location.href = uri; }, 150);
+})();
+</script>
+</body>
+</html>
